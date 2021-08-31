@@ -17,9 +17,7 @@ export default function App() {
         [
           {
             text: "Cancel",
-            onPress: () => {
-              setContent("Guess number between 1-100");
-            },
+            onPress: () => setContent("Guess number between 1-100"),
           },
         ]
       );
