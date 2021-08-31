@@ -1,18 +1,14 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { StyleSheet, TextInput, Text, View, Alert, Button } from "react-native";
 
 export default function App() {
+  const randomNumber = () => Math.floor(Math.random() * 100) + 1;
   const [count, setCount] = useState(0);
-  const [secretNumber, setSecretNumber] = useState(12);
+  const [secretNumber, setSecretNumber] = useState(randomNumber());
   const [content, setContent] = useState("Guess number between 1-100");
   const [guessNumber, setGuessNumber] = useState("");
-  const randomNumber = Math.floor(Math.random() * 100) + 1;
 
-  useEffect(() => {
-    setSecretNumber(randomNumber);
-  }, [secretNumber]);
-  console.log("aaaa", secretNumber);
   const guestResult = () => {
     if (secretNumber === parseInt(guessNumber)) {
       Alert.alert(
@@ -29,7 +25,7 @@ export default function App() {
       );
       setGuessNumber("");
       setCount(0);
-      setSecretNumber(0);
+      setSecretNumber(randomNumber());
     } else if (secretNumber > parseInt(guessNumber)) {
       setContent("Your guess is too low");
       setCount(count + 1);
