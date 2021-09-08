@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { RootStackParamList, Data } from './App'
 
-export default function HomeScreen ({ navigation }: any) {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, 'Home'>
+}
+
+export default function HomeScreen ({ navigation }: Props) {
   const [num1, setNum1] = useState<string>()
   const [num2, setNum2] = useState<string>()
   const [sign, setSign] = useState<string>()
   const [result, setResult] = useState<number>()
+  const [data, setData] = useState<Data[]>([])
 
   useEffect(() => {
-    if (result && sign) {
+    console.log(sign)
+    if (sign) {
+      setData([...data, { content: `${num1} ${sign} ${num2} = ${result}` }])
       setNum1('')
       setNum2('')
       setSign('')
     }
-  }, [result])
+  }, [result, sign])
   const covertDecimal = (numberStr: any) => {
     const decimal: any = numberStr
     return parseFloat(decimal.replace(',', '.'))
@@ -55,7 +64,7 @@ export default function HomeScreen ({ navigation }: any) {
           />
           <Button
             title='History'
-            onPress={() => navigation.navigate('History', { user: 'tram' })}
+            onPress={() => navigation.navigate('History', { operation: data })}
           />
         </View>
       </View>
@@ -80,12 +89,3 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   }
 })
-
-//   <View style={styles.listcontainer}>
-//   <Text>History</Text>
-//   <FlatList
-//     data={data}
-//     renderItem={({ item }) => <Text>{item.content}</Text>}
-//     keyExtractor={(item, index) => index.toString()}
-//   />
-// </View>
