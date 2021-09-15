@@ -6,8 +6,9 @@ import { StackNavigationProp } from "@react-navigation/stack";
 type Props = {
   route: StackNavigationProp<RootStackParamList, "History">;
 };
-export default function HistoryScreen(route: any) {
+export default function HistoryScreen({ route }: any) {
   const { operation } = route.params;
+  console.log(operation);
   return (
     <View style={styles.listContainer}>
       <Text>History</Text>

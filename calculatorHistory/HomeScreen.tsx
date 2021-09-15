@@ -9,8 +9,8 @@ type Props = {
 };
 
 export default function HomeScreen({ navigation }: Props) {
-  const [num1, setNum1] = useState<string>();
-  const [num2, setNum2] = useState<string>();
+  const [num1, setNum1] = useState<string>("");
+  const [num2, setNum2] = useState<string>("");
   const [sign, setSign] = useState<string>();
   const [result, setResult] = useState<number>();
   const [data, setData] = useState<Data[]>([]);
@@ -23,11 +23,11 @@ export default function HomeScreen({ navigation }: Props) {
       setSign("");
     }
   }, [result, sign]);
-  const covertDecimal = (numberStr: any) => {
-    const decimal: any = numberStr;
+  const covertDecimal = (numberStr: string): number => {
+    const decimal: string = numberStr;
     return parseFloat(decimal.replace(",", "."));
   };
-  const handleOperation = (sign: string) => {
+  const handleOperation = (sign: string): void => {
     if (sign === "+") {
       setResult(covertDecimal(num1) + covertDecimal(num2));
       setSign("+");
