@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TextInput, Button } from "react-native";
+import { View, Text, StyleSheet, TextInput, Button, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { Recipes } from "../types";
+import { Recipes, Thumbnail } from "../types";
 import { StatusBar } from "expo-status-bar";
 
 export default function RecipeScreen() {
@@ -20,36 +20,44 @@ export default function RecipeScreen() {
     setInput("");
   };
   return (
-    <View style={styles.container}>
+    <>
       <View style={styles.container}>
-        <View>
-          <Text>Recipe Finder</Text>
-          <TextInput
-            style={styles.textInput}
-            value={input}
-            onChangeText={(input) => setInput(input)}
-            placeholder="Descreptions"
+        <TextInput
+          style={styles.textInput}
+          value={input}
+          onChangeText={(input) => setInput(input)}
+          placeholder="Type your ingredients"
+          onSubmitEditing={() => findRecipe()}
+        />
+        <Button
+          title="Find"
+          onPress={() => handleFind()}
+          disabled={input ? false : true}
+        />
+      </View>
+      <View style={styles.resultList}>
+        {recipes ? (
+          <FlatList
+            data={recipes}
+            renderItem={({ item }) => (
+              <>
+                <Text>{item.strMeal}</Text>
+                <Image
+                  style={styles.tinyLogo}
+                  source={{
+                    uri: item.strMealThumb,
+                  }}
+                />
+              </>
+            )}
+            keyExtractor={(item) => item.idMeal}
           />
-          <Button
-            title="Start to find recipes"
-            onPress={() => handleFind()}
-            disabled={input ? false : true}
-          />
-        </View>
-        <View style={styles.resultList}>
-          {recipes ? (
-            <FlatList
-              data={recipes}
-              renderItem={({ item }) => <Text>{item.strMeal}</Text>}
-              keyExtractor={(item) => item.idMeal}
-            />
-          ) : (
-            <Text>No result</Text>
-          )}
-        </View>
+        ) : (
+          <Text>No result</Text>
+        )}
       </View>
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }
 
@@ -58,7 +66,17 @@ const styles = StyleSheet.create({
     padding: 50,
     alignItems: "center",
     justifyContent: "center",
-    flex: 1,
+  },
+  title: {
+    fontSize: 30,
+  },
+  btn: {
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
+  },
+  tinyLogo: {
+    width: 50,
+    height: 50,
   },
   textInput: {
     width: 200,
@@ -68,5 +86,10 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
   },
-  resultList: {},
+  resultList: {
+    backgroundColor: "gray",
+    padding: 20,
+    flex: 1,
+    alignItems: "center",
+  },
 });
