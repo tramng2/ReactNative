@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, Button, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { Recipes, Thumbnail } from "../types";
 import { StatusBar } from "expo-status-bar";
+import RecipeList from "./RecipeList";
 
 export default function RecipeScreen() {
   const [input, setInput] = useState<string>("");
@@ -19,6 +20,7 @@ export default function RecipeScreen() {
     findRecipe();
     setInput("");
   };
+  const renderRecipeList = () => {};
   return (
     <>
       <View style={styles.container}>
@@ -40,15 +42,16 @@ export default function RecipeScreen() {
           <FlatList
             data={recipes}
             renderItem={({ item }) => (
-              <>
-                <Text>{item.strMeal}</Text>
-                <Image
-                  style={styles.tinyLogo}
-                  source={{
-                    uri: item.strMealThumb,
-                  }}
-                />
-              </>
+              <RecipeList item={item} styles={styles} />
+              // <View>
+              //   <Text>{item.strMeal}</Text>
+              //   <Image
+              //     style={styles.tinyLogo}
+              //     source={{
+              //       uri: item.strMealThumb,
+              //     }}
+              //   />
+              // </View>
             )}
             keyExtractor={(item) => item.idMeal}
           />
@@ -63,7 +66,7 @@ export default function RecipeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 50,
+    padding: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -87,9 +90,6 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   resultList: {
-    backgroundColor: "gray",
-    padding: 20,
-    flex: 1,
     alignItems: "center",
   },
 });
