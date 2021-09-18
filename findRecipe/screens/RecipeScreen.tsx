@@ -43,15 +43,6 @@ export default function RecipeScreen() {
             data={recipes}
             renderItem={({ item }) => (
               <RecipeList item={item} styles={styles} />
-              // <View>
-              //   <Text>{item.strMeal}</Text>
-              //   <Image
-              //     style={styles.tinyLogo}
-              //     source={{
-              //       uri: item.strMealThumb,
-              //     }}
-              //   />
-              // </View>
             )}
             keyExtractor={(item) => item.idMeal}
           />
@@ -87,7 +78,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     padding: 5,
-    margin: 5,
+    margin: 15,
   },
   resultList: {
     alignItems: "center",

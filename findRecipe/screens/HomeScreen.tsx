@@ -23,11 +23,13 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    justifyContent: "space-around",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
   },
   txt: {
     fontSize: 20,
     fontWeight: "bold",
+    margin: 50,
   },
 });
