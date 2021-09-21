@@ -23,7 +23,7 @@ function HomeScreen() {
   }, []);
 
   const handleConvert = async () => {
-    const euroAmount = Number(input) * Number(selectedCurrency);
+    const euroAmount = Number(input) / Number(selectedCurrency);
     setEuroCoverted(Math.round(euroAmount * 100) / 100);
     setInput("");
   };
