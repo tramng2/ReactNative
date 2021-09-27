@@ -15,7 +15,7 @@ function MapScreen({ route }: any) {
       const { location } = route.params;
       setLatitude(location.displayLatLng.lat);
       setLongitude(location.displayLatLng.lng);
-      setMarker(location.street);
+      setMarker(location.adminArea1);
     }
   }, [route]);
   return (
@@ -24,8 +24,8 @@ function MapScreen({ route }: any) {
       region={{
         latitude: latitude,
         longitude: longitude,
-        latitudeDelta: 0.0322,
-        longitudeDelta: 0.0221,
+        latitudeDelta: 0.00322,
+        longitudeDelta: 0.00221,
       }}
     >
       <Marker

@@ -40,7 +40,7 @@ function Search({ navigation }: Props) {
           style={styles.input}
           onChangeText={(text) => setInput(text)}
           value={input}
-          placeholder="Search hererr"
+          placeholder="Search here..."
           maxLength={1000}
           onSubmitEditing={() => handleClick()}
         />
