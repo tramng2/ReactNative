@@ -1,4 +1,5 @@
 import { StackNavigationProp } from "@react-navigation/stack";
+import { LocationObject } from "expo-location";
 
 export interface Locations {
   [key: string]: string | Object;

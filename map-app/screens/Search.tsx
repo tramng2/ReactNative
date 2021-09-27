@@ -1,7 +1,7 @@
 import { API_KEY } from "@env";
-import React, { useState, useEffect } from "react";
-import { StyleSheet, TextInput, View, Text } from "react-native";
-import { Locations, LatLgn, RootStackParamList } from "../types";
+import React, { useState } from "react";
+import { StyleSheet, TextInput, View } from "react-native";
+import { Locations, RootStackParamList } from "../types";
 import SearchList from "./SearchList";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -28,10 +28,13 @@ function Search({ navigation }: Props) {
       setLocations([{ street: "Can't find that place" }]);
     }
   };
+
   const handleOnpress = (item: Locations): void => {
     setInput("");
     setLocations([]);
-    navigation.navigate("Map", { location: item });
+    navigation.navigate("Map", {
+      location: item,
+    });
   };
   return (
     <>

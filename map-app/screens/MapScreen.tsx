@@ -10,6 +10,7 @@ function MapScreen({ route }: any) {
   const [latitude, setLatitude] = useState<number>(60.200692);
   const [longitude, setLongitude] = useState<number>(24.934302);
   const [marker, setMarker] = useState<string>("Haaga-Helia");
+
   useEffect(() => {
     if (route) {
       const { location } = route.params;
