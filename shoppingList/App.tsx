@@ -81,38 +81,35 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
-        <Text>Shopping list</Text>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={(stuff) => setStuff(stuff)}
-          value={stuff}
-        />
-        <TextInput
-          keyboardType="numeric"
-          style={styles.textInput}
-          onChangeText={(amount) => setAmount(amount)}
-          value={amount}
-        />
-        <StatusBar style="auto" />
-      </View>
-      <View style={{ flexDirection: "row" }}>
-        <Button title="ADD" onPress={saveItem} />
-      </View>
+      <TextInput
+        style={styles.textInput1}
+        onChangeText={(stuff) => setStuff(stuff)}
+        value={stuff}
+        placeholder="item"
+      />
+      <TextInput
+        keyboardType="numeric"
+        style={styles.textInput2}
+        onChangeText={(amount) => setAmount(amount)}
+        value={amount}
+        placeholder="amount"
+      />
+      <Button title="ADD" onPress={saveItem} />
+      <Text style={{ fontSize: 20 }}>Shopping list</Text>
 
       <FlatList
         style={{ marginLeft: "5%" }}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.listcontainer}>
-            <Text style={{ fontSize: 18 }}>
-              {item.stuff} {item.amount}
+            <Text style={{ fontSize: 15 }}>
+              {item.stuff}, {item.amount}
             </Text>
             <Text
-              style={{ fontSize: 18, color: "#0000ff", marginLeft: 12 }}
+              style={{ fontSize: 15, color: "#0000ff", marginLeft: 5 }}
               onPress={() => deleteItem(item.id)}
             >
-              Done
+              bought
             </Text>
           </View>
         )}
@@ -128,16 +125,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "center",
   },
   listcontainer: {
-    flex: 2,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "flex-start",
     flexDirection: "row",
+    backgroundColor: "#fff",
+    alignItems: "center",
   },
-  textInput: {
+  textInput1: {
+    marginTop: 70,
+    fontSize: 18,
+    width: 200,
+    borderColor: "gray",
+    borderWidth: 1,
+  },
+  textInput2: {
+    marginTop: 5,
+    marginBottom: 5,
+    fontSize: 18,
     width: 200,
     borderColor: "gray",
     borderWidth: 1,
