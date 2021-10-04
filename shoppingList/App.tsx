@@ -9,85 +9,107 @@ import {
   FlatList,
 } from "react-native";
 import * as SQLite from "expo-sqlite";
+import * as FileSystem from "expo-file-system";
+
 interface Data {
   stuff: string;
+  id: number;
+  amount: number;
 }
 const db = SQLite.openDatabase("shoppinglistdb.db");
-console.log(db);
 
 export default function App() {
-  const [item, setItem] = useState<string>("");
+  const [stuff, setStuff] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
   const [data, setData] = useState<Data[]>([]);
 
+  console.log(FileSystem.documentDirectory);
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        "create table if not exists shoppinglist (id integer primary key not null, stuff text);"
+        "create table if not exists shoppinglist (id integer primary key not null, amount int, stuff text);"
       );
     });
     updateList();
   }, []);
 
-  // const handlePress = () => {
-  //   setData([...data, { key: item }]);
-  //   setItem("");
-  // };
   const saveItem = () => {
     db.transaction(
       (tx) => {
-        tx.executeSql("insert into shoppinglist (stuff) values (?);", [item]);
+        tx.executeSql(
+          "insert into shoppinglist (amount, stuff) values (?, ?);",
+          [parseInt(amount), stuff]
+        );
+      },
+      undefined,
+      updateList
+    );
+    setAmount("");
+    setStuff("");
+  };
+
+  const updateList = () => {
+    db.transaction((tx) => {
+      tx.executeSql("select * from shoppinglist;", [], (_, { rows }: any) =>
+        setData(rows._array)
+      );
+    });
+  };
+
+  const deleteItem = (id: number) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(`delete from shoppinglist where id = ?;`, [id]);
       },
       undefined,
       updateList
     );
   };
 
-  const updateList = () => {
-    db.transaction((tx) => {
-      tx.executeSql("select * from shoppinglist;", [], (_, { rows }) =>
-        setData(rows._array)
-      );
-    });
-  };
-
-  const handleClear = () => {
-    setItem("");
-  };
-  const deleteItem = (id) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(`delete from shoppinglist where id = ?;`, [id]);
-      },
-      null,
-      updateList
+  const listSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 5,
+          width: "80%",
+          backgroundColor: "#fff",
+          marginLeft: "10%",
+        }}
+      />
     );
   };
 
-  console.log(data);
   return (
     <View style={styles.container}>
       <View style={styles.container}>
+        <Text>Shopping list</Text>
         <TextInput
           style={styles.textInput}
-          onChangeText={(input) => setItem(input)}
-          value={item}
+          onChangeText={(stuff) => setStuff(stuff)}
+          value={stuff}
+        />
+        <TextInput
+          keyboardType="numeric"
+          style={styles.textInput}
+          onChangeText={(amount) => setAmount(amount)}
+          value={amount}
         />
         <StatusBar style="auto" />
       </View>
       <View style={{ flexDirection: "row" }}>
         <Button title="ADD" onPress={saveItem} />
-        <Button title="CLEAR" onPress={handleClear} />
       </View>
-      <Text style={{ color: "blue" }}>Shopping list</Text>
 
       <FlatList
         style={{ marginLeft: "5%" }}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.listcontainer}>
-            <Text style={{ fontSize: 18 }}>{item.stuff}</Text>
+            <Text style={{ fontSize: 18 }}>
+              {item.stuff} {item.amount}
+            </Text>
             <Text
-              style={{ fontSize: 18, color: "#0000ff" }}
+              style={{ fontSize: 18, color: "#0000ff", marginLeft: 12 }}
               onPress={() => deleteItem(item.id)}
             >
               Done
@@ -95,6 +117,7 @@ export default function App() {
           </View>
         )}
         data={data}
+        ItemSeparatorComponent={listSeparator}
       />
     </View>
   );
@@ -112,6 +135,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     justifyContent: "flex-start",
+    flexDirection: "row",
   },
   textInput: {
     width: 200,
@@ -119,147 +143,3 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 });
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   StyleSheet,
-//   Text,
-//   TextInput,
-//   View,
-//   Button,
-//   FlatList,
-// } from "react-native";
-// import * as SQLite from "expo-sqlite";
-
-// const db = SQLite.openDatabase("coursedb.db");
-// console.log(db);
-// export default function App() {
-//   const [credit, setCredit] = useState("");
-//   const [title, setTitle] = useState("");
-//   const [courses, setCourses] = useState([]);
-
-//   useEffect(() => {
-//     db.transaction((tx) => {
-//       tx.executeSql(
-//         "create table if not exists course (id integer primary key not null, credits int, title text);"
-//       );
-//     });
-//     updateList();
-//   }, []);
-
-//   // Save course
-//   const saveItem = () => {
-//     console.log("dkm");
-//     db.transaction(
-//       (tx) => {
-//         tx.executeSql("insert into course (credits, title) values (?, ?);", [
-//           parseInt(credit),
-//           title,
-//         ]);
-//       },
-//       null,
-//       updateList
-//     );
-//   };
-
-//   // Update courselist
-//   const updateList = () => {
-//     db.transaction((tx) => {
-//       tx.executeSql("select * from course;", [], (_, { rows }) =>
-//         setCourses(rows._array)
-//       );
-//     });
-//     console.log("dkm3");
-//   };
-
-//   // Delete course
-//   const deleteItem = (id) => {
-//     db.transaction(
-//       (tx) => {
-//         tx.executeSql(`delete from course where id = ?;`, [id]);
-//       },
-//       null,
-//       updateList
-//     );
-//   };
-
-//   const listSeparator = () => {
-//     return (
-//       <View
-//         style={{
-//           height: 5,
-//           width: "80%",
-//           backgroundColor: "#fff",
-//           marginLeft: "10%",
-//         }}
-//       />
-//     );
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <TextInput
-//         placeholder="Title"
-//         style={{
-//           marginTop: 30,
-//           fontSize: 18,
-//           width: 200,
-//           borderColor: "gray",
-//           borderWidth: 1,
-//         }}
-//         onChangeText={(title) => setTitle(title)}
-//         value={title}
-//       />
-//       <TextInput
-//         placeholder="Credits"
-//         keyboardType="numeric"
-//         style={{
-//           marginTop: 5,
-//           marginBottom: 5,
-//           fontSize: 18,
-//           width: 200,
-//           borderColor: "gray",
-//           borderWidth: 1,
-//         }}
-//         onChangeText={(credit) => setCredit(credit)}
-//         value={credit}
-//       />
-//       <Button onPress={saveItem} title="Save" />
-//       <Text style={{ marginTop: 30, fontSize: 20 }}>Courses</Text>
-//       <FlatList
-//         style={{ marginLeft: "5%" }}
-//         keyExtractor={(item) => item.id.toString()}
-//         renderItem={({ item }) => (
-//           <View style={styles.listcontainer}>
-//             <Text style={{ fontSize: 18 }}>
-//               {item.title}, {item.credits}
-//             </Text>
-//             <Text
-//               style={{ fontSize: 18, color: "#0000ff" }}
-//               onPress={() => deleteItem(item.id)}
-//             >
-//               {" "}
-//               Done
-//             </Text>
-//           </View>
-//         )}
-//         data={courses}
-//         ItemSeparatorComponent={listSeparator}
-//       />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-//   listcontainer: {
-//     flexDirection: "row",
-//     backgroundColor: "#fff",
-//     alignItems: "center",
-//   },
-// });
