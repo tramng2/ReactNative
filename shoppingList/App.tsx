@@ -10,18 +10,14 @@ import {
 } from "react-native";
 import * as SQLite from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
+import { Product } from "./type";
 
-interface Data {
-  stuff: string;
-  id: number;
-  amount: number;
-}
 const db = SQLite.openDatabase("shoppinglistdb.db");
 
 export default function App() {
-  const [stuff, setStuff] = useState<string>("");
+  const [item, setItem] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [data, setData] = useState<Data[]>([]);
+  const [product, setProduct] = useState<Product[]>([]);
 
   console.log(FileSystem.documentDirectory);
   useEffect(() => {
@@ -38,20 +34,20 @@ export default function App() {
       (tx) => {
         tx.executeSql(
           "insert into shoppinglist (amount, stuff) values (?, ?);",
-          [parseInt(amount), stuff]
+          [parseInt(amount), item]
         );
       },
       undefined,
       updateList
     );
     setAmount("");
-    setStuff("");
+    setItem("");
   };
 
   const updateList = () => {
     db.transaction((tx) => {
       tx.executeSql("select * from shoppinglist;", [], (_, { rows }: any) =>
-        setData(rows._array)
+        setProduct(rows._array)
       );
     });
   };
@@ -83,8 +79,8 @@ export default function App() {
     <View style={styles.container}>
       <TextInput
         style={styles.textInput1}
-        onChangeText={(stuff) => setStuff(stuff)}
-        value={stuff}
+        onChangeText={(input) => setItem(input)}
+        value={item}
         placeholder="item"
       />
       <TextInput
@@ -113,7 +109,7 @@ export default function App() {
             </Text>
           </View>
         )}
-        data={data}
+        data={product}
         ItemSeparatorComponent={listSeparator}
       />
     </View>
