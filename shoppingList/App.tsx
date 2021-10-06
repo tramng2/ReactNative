@@ -22,28 +22,26 @@ export default function App() {
       .database()
       .ref("items/")
       .on("value", (snapshot: any) => {
-        const data = snapshot.val();
-        if (data) {
-          setProduct(Object.values(data));
-        }
+        const aux: Data[] = [];
+        snapshot.forEach((child: any) => {
+          aux.push({
+            item: child.val().item,
+            amount: child.val().amount,
+            id: child.key,
+          });
+        });
+        setProduct(aux);
       });
   }, []);
   const saveItem = () => {
     if (amount && item) {
-      const id = firebase.database().ref("items/").push().getKey();
-      firebase
-        .database()
-        .ref("items/")
-        .push({ item: item, amount: amount, id: id });
+      firebase.database().ref("items/").push({ item: item, amount: amount });
     } else {
       Alert.alert("Error", "Type product");
     }
   };
   const deleteItem = (id: any) => {
-    console.log(id);
-    const itemDelete = firebase
-      .database()
-      .ref("item/" + "-MlKs2kuF5zztFlEdPcH");
+    const itemDelete = firebase.database().ref("items/" + id);
     itemDelete.remove();
   };
 
