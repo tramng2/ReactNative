@@ -1,69 +1,50 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
   TextInput,
   View,
   Button,
   Text,
   FlatList,
+  Alert,
+  SegmentedControlIOSComponent,
 } from "react-native";
-import * as SQLite from "expo-sqlite";
-import * as FileSystem from "expo-file-system";
-
-interface Data {
-  stuff: string;
-  id: number;
-  amount: number;
-}
-const db = SQLite.openDatabase("shoppinglistdb.db");
+import { Data } from "./type";
+import { styles } from "./style";
+import firebase from "./config";
 
 export default function App() {
-  const [stuff, setStuff] = useState<string>("");
+  const [item, setItem] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
-  const [data, setData] = useState<Data[]>([]);
+  const [product, setProduct] = useState<Data[]>([]);
 
-  console.log(FileSystem.documentDirectory);
   useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "create table if not exists shoppinglist (id integer primary key not null, amount int, stuff text);"
-      );
-    });
-    updateList();
+    firebase
+      .database()
+      .ref("items/")
+      .on("value", (snapshot: any) => {
+        const data = snapshot.val();
+        if (data) {
+          setProduct(Object.values(data));
+        }
+      });
   }, []);
-
   const saveItem = () => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          "insert into shoppinglist (amount, stuff) values (?, ?);",
-          [parseInt(amount), stuff]
-        );
-      },
-      undefined,
-      updateList
-    );
-    setAmount("");
-    setStuff("");
+    if (amount && item) {
+      const id = firebase.database().ref("items/").push().getKey();
+      firebase
+        .database()
+        .ref("items/")
+        .push({ item: item, amount: amount, id: id });
+    } else {
+      Alert.alert("Error", "Type product");
+    }
   };
-
-  const updateList = () => {
-    db.transaction((tx) => {
-      tx.executeSql("select * from shoppinglist;", [], (_, { rows }: any) =>
-        setData(rows._array)
-      );
-    });
-  };
-
-  const deleteItem = (id: number) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(`delete from shoppinglist where id = ?;`, [id]);
-      },
-      undefined,
-      updateList
-    );
+  const deleteItem = (id: any) => {
+    console.log(id);
+    const itemDelete = firebase
+      .database()
+      .ref("item/" + "-MlKs2kuF5zztFlEdPcH");
+    itemDelete.remove();
   };
 
   const listSeparator = () => {
@@ -83,8 +64,8 @@ export default function App() {
     <View style={styles.container}>
       <TextInput
         style={styles.textInput1}
-        onChangeText={(stuff) => setStuff(stuff)}
-        value={stuff}
+        onChangeText={(input) => setItem(input)}
+        value={item}
         placeholder="item"
       />
       <TextInput
@@ -99,11 +80,12 @@ export default function App() {
 
       <FlatList
         style={{ marginLeft: "5%" }}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => index.toString()}
+        data={product}
         renderItem={({ item }) => (
           <View style={styles.listcontainer}>
             <Text style={{ fontSize: 15 }}>
-              {item.stuff}, {item.amount}
+              {item.item}, {item.amount}
             </Text>
             <Text
               style={{ fontSize: 15, color: "#0000ff", marginLeft: 5 }}
@@ -113,38 +95,8 @@ export default function App() {
             </Text>
           </View>
         )}
-        data={data}
         ItemSeparatorComponent={listSeparator}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  listcontainer: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    alignItems: "center",
-  },
-  textInput1: {
-    marginTop: 70,
-    fontSize: 18,
-    width: 200,
-    borderColor: "gray",
-    borderWidth: 1,
-  },
-  textInput2: {
-    marginTop: 5,
-    marginBottom: 5,
-    fontSize: 18,
-    width: 200,
-    borderColor: "gray",
-    borderWidth: 1,
-  },
-});
