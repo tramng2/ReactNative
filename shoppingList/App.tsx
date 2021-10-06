@@ -1,70 +1,100 @@
-import { StatusBar } from 'expo-status-bar'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
   TextInput,
   View,
   Button,
   Text,
-  FlatList
-} from 'react-native'
+  FlatList,
+  Alert,
+  SegmentedControlIOSComponent,
+} from "react-native";
+import { Data } from "./type";
+import { styles } from "./style";
+import firebase from "./config";
 
-interface Data {
-  key: string
-}
-export default function App () {
-  const [item, setItem] = useState<string>('')
-  const [data, setData] = useState<Data[]>([])
-  const handlePress = () => {
-    setData([...data, { key: item }])
-    setItem('')
-  }
-  const handleClear = () => {
-    setData([])
-    setItem('')
-  }
+export default function App() {
+  const [item, setItem] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [product, setProduct] = useState<Data[]>([]);
+
+  useEffect(() => {
+    firebase
+      .database()
+      .ref("items/")
+      .on("value", (snapshot: any) => {
+        const aux: Data[] = [];
+        snapshot.forEach((child: any) => {
+          aux.push({
+            item: child.val().item,
+            amount: child.val().amount,
+            id: child.key,
+          });
+        });
+        setProduct(aux);
+      });
+  }, []);
+  const saveItem = () => {
+    if (amount && item) {
+      firebase.database().ref("items/").push({ item: item, amount: amount });
+    } else {
+      Alert.alert("Error", "Type product");
+    }
+  };
+  const deleteItem = (id: any) => {
+    const itemDelete = firebase.database().ref("items/" + id);
+    itemDelete.remove();
+  };
+
+  const listSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 5,
+          width: "80%",
+          backgroundColor: "#fff",
+          marginLeft: "10%",
+        }}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={input => setItem(input)}
-          value={item}
-        />
-        <StatusBar style='auto' />
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Button title='ADD' onPress={handlePress} />
-        <Button title='CLEAR' onPress={handleClear} />
-      </View>
-      <View style={styles.listcontainer}>
-        <Text style={{ color: 'blue' }}>Shopping list</Text>
-        <FlatList
-          data={data}
-          renderItem={({ item }) => <Text>{item.key}</Text>}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
-    </View>
-  )
-}
+      <TextInput
+        style={styles.textInput1}
+        onChangeText={(input) => setItem(input)}
+        value={item}
+        placeholder="item"
+      />
+      <TextInput
+        keyboardType="numeric"
+        style={styles.textInput2}
+        onChangeText={(amount) => setAmount(amount)}
+        value={amount}
+        placeholder="amount"
+      />
+      <Button title="ADD" onPress={saveItem} />
+      <Text style={{ fontSize: 20 }}>Shopping list</Text>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'flex-end'
-  },
-  listcontainer: {
-    flex: 2,
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'flex-start'
-  },
-  textInput: {
-    width: 200,
-    borderColor: 'gray',
-    borderWidth: 1
-  }
-})
+      <FlatList
+        style={{ marginLeft: "5%" }}
+        keyExtractor={(item, index) => index.toString()}
+        data={product}
+        renderItem={({ item }) => (
+          <View style={styles.listcontainer}>
+            <Text style={{ fontSize: 15 }}>
+              {item.item}, {item.amount}
+            </Text>
+            <Text
+              style={{ fontSize: 15, color: "#0000ff", marginLeft: 5 }}
+              onPress={() => deleteItem(item.id)}
+            >
+              bought
+            </Text>
+          </View>
+        )}
+        ItemSeparatorComponent={listSeparator}
+      />
+    </View>
+  );
+}
